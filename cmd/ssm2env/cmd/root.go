@@ -10,40 +10,65 @@ import (
 	"github.com/shopsmart/ssm2env"
 )
 
-var verbose bool
+// New creates a new cobra command for the given version
+func New(version string) *cobra.Command {
+	rootCmd := &cobra.Command{
+		Use:   "ssm2env",
+		Short: "Pulls SSM paramters into env format",
+		Long: `SSM2Env pulls paramters from AWS SSM Param Store
+		and puts them in env format
 
-// rootCmd represents the base command when called without any subcommands
-var rootCmd = &cobra.Command{
-	Use:   "ssm2env",
-	Short: "Pulls SSM paramters into env format",
-	Long: `SSM2Env pulls paramters from AWS SSM Param Store
-	and puts them in env format
+		ssm2env /my/prefix
+	`,
+		Args: cobra.MaximumNArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			var v bool
+			v, _ = cmd.Flags().GetBool("verbose")
+			if v {
+				log.SetLevel(log.DebugLevel)
+			}
 
-	ssm2env /my/prefix
-`,
-	Args: cobra.ExactArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
-		if verbose {
-			log.SetLevel(log.DebugLevel)
-		}
+			v, _ = cmd.Flags().GetBool("version")
+			if v {
+				fmt.Println(version)
+				return
+			}
 
-		err := ssm2env.Collect(os.Stdout, args[0])
-		if err != nil {
-			log.Fatal(err)
-			return
-		}
-	},
+			validArgs := []string{}
+			for _, arg := range args {
+				if arg != "" {
+					validArgs = append(validArgs, arg)
+				}
+			}
+
+			if len(validArgs) < 1 {
+				if err := cmd.Help(); err != nil {
+					log.Fatal(err)
+				}
+				return
+			}
+
+			err := ssm2env.Collect(os.Stdout, validArgs[0])
+			if err != nil {
+				log.Fatal(err)
+				return
+			}
+		},
+	}
+
+	rootCmd.PersistentFlags().Bool("verbose", false, "enables verbose output")
+	rootCmd.PersistentFlags().Bool("version", false, "prints the version and exits")
+
+	return rootCmd
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute() {
-	if err := rootCmd.Execute(); err != nil {
+func Execute(version string) {
+	cmd := New(version)
+
+	if err := cmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-}
-
-func init() {
-	rootCmd.PersistentFlags().BoolVar(&verbose, "verbose", false, "enables verbose output")
 }

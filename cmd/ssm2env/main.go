@@ -17,6 +17,8 @@ package main
 
 import "github.com/shopsmart/ssm2env/cmd/ssm2env/cmd"
 
+var version = "development"
+
 func main() {
-	cmd.Execute()
+	cmd.Execute(version)
 }
