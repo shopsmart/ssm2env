@@ -15,10 +15,6 @@ teams:
     permission: admin
   - name: developers
     permission: push
-  # For non-template repos:
-  # Owner team should be admin here. Ex:
-  # - name: web-team
-  #   permission: admin
 
 branches:
   - name: main
