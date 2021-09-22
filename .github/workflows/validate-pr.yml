@@ -57,3 +57,39 @@ jobs:
 
       - name: 'Run pre-commit check'
         uses: pre-commit/action@v2.0.0
+
+  integration:
+    name: 'Run integration tests'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v2
+
+      - name: 'Get go version'
+        id: goversion
+        run: |
+          set -eo pipefail
+          version="$(< .go-version)"
+          echo "::set-output name=version::$version"
+      - name: 'Setup go'
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ steps.goversion.outputs.version }}
+
+      - name: 'Install dependencies'
+        run: brew install bats-core jq
+
+      - name: 'Run GoReleaser'
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          distribution: goreleaser
+          version: latest
+          args: snapshot --rm-dist
+
+      - name: 'Run integration tests'
+        env:
+          TEST_SSM2ENV_PREFIX: ${{ secrets.TF_VAR_PREFIX }}
+          TEST_SSM2ENV_PARAMETERS: ${{ secrets.TF_VAR_PARAMETERS }}
+          TEST_SSM2ENV_EXECUTABLE: dist/ssm2env_linux_amd64/ssm2env
+          TEST_SSM2ENV_INTEGRATION: 0
+        run: bats -r 'bats/*.bats'
