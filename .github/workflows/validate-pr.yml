@@ -55,6 +55,12 @@ jobs:
         with:
           go-version: ${{ steps.goversion.outputs.version }}
 
+      - name: 'Install dependencies'
+        run: |
+          go get -u golang.org/x/lint/golint
+          go install github.com/fzipp/gocyclo/cmd/gocyclo@latest
+          brew install golangci-lint
+
       - name: 'Run pre-commit check'
         uses: pre-commit/action@v2.0.0
 
