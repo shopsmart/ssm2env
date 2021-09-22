@@ -1,6 +1,13 @@
 #!/usr/bin/env bats
 
-export TEST_SSM2ENV_EXECUTABLE="${TEST_SSM2ENV_EXECUTABLE:-$BATS_TEST_DIRNAME/../bin/ssm2env}"
+[ -n "$TEST_SSM2ENV_EXECUTABLE" ] || {
+  TEST_SSM2ENV_EXECUTABLE="$BATS_TEST_DIRNAME/../bin/ssm2env"
+  if [ $TEST_SSM2ENV_INTEGRATION_MOCK_CLIENT -eq 0 ]; then
+    TEST_SSM2ENV_EXECUTABLE="${TEST_SSM2ENV_EXECUTABLE}mock"
+  fi
+}
+export TEST_SSM2ENV_EXECUTABLE
+
 
 load helpers/integration.bash
 
@@ -12,18 +19,37 @@ function teardown() {
   integration_teardown
 }
 
-@test "it should require 1 arg" {
+@test "it should log a warning when using mock client" {
+  [ $TEST_SSM2ENV_INTEGRATION_MOCK_CLIENT -eq 0 ] || skip
+
+  run "$TEST_SSM2ENV_EXECUTABLE"
+
+  echo "$output"
+
+  [ $status -eq 0 ]
+  [[ "$output" =~ ^.*level=warning\ msg=\"Using\ ssm\ mock\ for\ params\".*$ ]]
+}
+
+@test "it should print help if no args are provided" {
   [ $TEST_SSM2ENV_INTEGRATION -eq 0 ] || skip
 
-  run "$EXECUTABLE"
+  run "$TEST_SSM2ENV_EXECUTABLE"
 
-  [ $status -ne 0 ]
+  [ $status -eq 0 ]
+}
+
+@test "it should print the version" {
+  [ $TEST_SSM2ENV_INTEGRATION -eq 0 ] || skip
+
+  run "$TEST_SSM2ENV_EXECUTABLE" --version
+
+  [ $status -eq 0 ]
 }
 
 @test "it should pull the ssm params from the prefix" {
   [ $TEST_SSM2ENV_INTEGRATION -eq 0 ] || skip
 
-  run "$EXECUTABLE" "$TEST_SSM2ENV_PREFIX"
+  run "$TEST_SSM2ENV_EXECUTABLE" "$TEST_SSM2ENV_PREFIX"
 
   [ $status -eq 0 ]
 

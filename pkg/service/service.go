@@ -4,14 +4,18 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ssm"
-	"github.com/aws/aws-sdk-go/service/ssm/ssmiface"
 
 	"github.com/shopsmart/ssm2env/pkg/utils"
 )
 
+// SSMClient abstracts out the single function used within the ssmiface
+type SSMClient interface {
+	GetParametersByPathPages(getParametersByPathInput *ssm.GetParametersByPathInput, fn func(resp *ssm.GetParametersByPathOutput, lastPage bool) bool) error
+}
+
 // Service will abstract out calls to AWS
 type Service struct {
-	SSMClient ssmiface.SSMAPI
+	SSMClient SSMClient
 }
 
 // New creates a new service
@@ -20,11 +24,14 @@ func New() (*Service, error) {
 		SharedConfigState: session.SharedConfigEnable,
 	}))
 
-	svc := &Service{
-		SSMClient: ssm.New(sess),
-	}
+	return NewFromClient(ssm.New(sess))
+}
 
-	return svc, nil
+// NewFromClient creates a new service from an implementation of the SSMClient
+func NewFromClient(ssmClient SSMClient) (*Service, error) {
+	return &Service{
+		SSMClient: ssmClient,
+	}, nil
 }
 
 // GetParameters fetches all of the parameters under a path into a map

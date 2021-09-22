@@ -79,17 +79,11 @@ jobs:
       - name: 'Install dependencies'
         run: brew install bats-core jq
 
-      - name: 'Run GoReleaser'
-        uses: goreleaser/goreleaser-action@v2
-        with:
-          distribution: goreleaser
-          version: latest
-          args: snapshot --rm-dist
-
       - name: 'Run integration tests'
         env:
           TEST_SSM2ENV_PREFIX: ${{ secrets.TF_VAR_PREFIX }}
           TEST_SSM2ENV_PARAMETERS: ${{ secrets.TF_VAR_PARAMETERS }}
-          TEST_SSM2ENV_EXECUTABLE: dist/ssm2env_linux_amd64/ssm2env
+          TEST_SSM2ENV_EXECUTABLE: bin/ssm2envmock
           TEST_SSM2ENV_INTEGRATION: 0
+          TEST_SSM2ENV_INTEGRATION_MOCK_CLIENT: 0
         run: bats -r 'bats/*.bats'

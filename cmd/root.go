@@ -8,10 +8,11 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/shopsmart/ssm2env"
+	"github.com/shopsmart/ssm2env/pkg/service"
 )
 
 // New creates a new cobra command for the given version
-func New(version string) *cobra.Command {
+func New(version string, svc *service.Service) *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:   "ssm2env",
 		Short: "Pulls SSM paramters into env format",
@@ -19,7 +20,7 @@ func New(version string) *cobra.Command {
 		and puts them in env format
 
 		ssm2env /my/prefix
-	`,
+		`,
 		Args: cobra.MaximumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			var v bool
@@ -48,7 +49,7 @@ func New(version string) *cobra.Command {
 				return
 			}
 
-			err := ssm2env.Collect(os.Stdout, validArgs[0])
+			err := ssm2env.Collect(svc, os.Stdout, validArgs[0])
 			if err != nil {
 				log.Fatal(err)
 				return
@@ -64,8 +65,8 @@ func New(version string) *cobra.Command {
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute(version string) {
-	cmd := New(version)
+func Execute(version string, svc *service.Service) {
+	cmd := New(version, svc)
 
 	if err := cmd.Execute(); err != nil {
 		fmt.Println(err)
