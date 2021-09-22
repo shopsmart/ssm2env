@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+script="$(basename "$0")"
+directory="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+executable="$directory/bin/$script.build"
+stdout="$directory/bin/build.stdout.log"
+stderr="$directory/bin/build.stderr.log"
+
+go build \
+  -o "$executable" \
+  "$directory/cmd/ssm2env" \
+  >"$stdout" \
+  2>"$stderr"
+
+status=$?
+[ $status -eq 0 ] || {
+  echo "[ERROR] Error while building $script"
+  cat "$stderr"
+  exit 255
+} >&2
+
+set -e
+
+"$executable" "${@:-}"

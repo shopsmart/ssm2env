@@ -21,15 +21,17 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.repository.name != 'go-template'
     steps:
-      - uses: actions/checkout@v2
+      - name: 'Checkout'
+        uses: actions/checkout@v2
 
-      - name: Get Go Version
+      - name: 'Get go version'
         id: goversion
         run: |
           set -eo pipefail
           version="$(< .go-version)"
           echo "::set-output name=version::$version"
-      - uses: actions/setup-go@v2
+      - name: 'Setup go'
+        uses: actions/setup-go@v2
         with:
           go-version: ${{ steps.goversion.outputs.version }}
 
@@ -39,22 +41,26 @@ jobs:
       - name: go test -v ./...
 
   precommit:
-    name: Run precommit check
+    name: 'Run precommit check'
     runs-on: ubuntu-latest
     if: github.event.repository.name != 'go-template'
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - name: 'Checkout'
+        uses: actions/checkout@v2
 
-      - name: Get Go Version
+      - name: 'Setup python'
+        uses: actions/setup-python@v2
+
+      - name: 'Get go version'
         id: goversion
         run: |
           set -eo pipefail
           version="$(< .go-version)"
           echo "::set-output name=version::$version"
-      - uses: actions/setup-go@v2
+      - name: 'Setup go'
+        uses: actions/setup-go@v2
         with:
           go-version: ${{ steps.goversion.outputs.version }}
 
-      - name: Run pre-commit check
+      - name: 'Run pre-commit check'
         uses: pre-commit/action@v2.0.0
