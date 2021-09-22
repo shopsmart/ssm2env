@@ -12,7 +12,7 @@ import (
 )
 
 // New creates a new cobra command for the given version
-func New(version string, svc *service.Service) *cobra.Command {
+func New(version string, svc service.Service) *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:   "ssm2env",
 		Short: "Pulls SSM paramters into env format",
@@ -65,7 +65,7 @@ func New(version string, svc *service.Service) *cobra.Command {
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute(version string, svc *service.Service) {
+func Execute(version string, svc service.Service) {
 	cmd := New(version, svc)
 
 	if err := cmd.Execute(); err != nil {

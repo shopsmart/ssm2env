@@ -11,7 +11,7 @@ import (
 
 // Collect retrieves the SSM parameters for the given search path and
 // writes to the writer in env format
-func Collect(svc *service.Service, w io.Writer, searchPath string) error {
+func Collect(svc service.Service, w io.Writer, searchPath string) error {
 	var err error
 	if svc == nil {
 		log.Debug("Initializing session")

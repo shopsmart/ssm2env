@@ -1,11 +1,12 @@
 package service
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ssm"
-
-	"github.com/shopsmart/ssm2env/pkg/utils"
 )
 
 // SSMClient abstracts out the single function used within the ssmiface
@@ -14,12 +15,17 @@ type SSMClient interface {
 }
 
 // Service will abstract out calls to AWS
-type Service struct {
+type Service interface {
+	GetParameters(searchPath string) (map[string]string, error)
+}
+
+// Impl will be the implementation of the Service interface
+type Impl struct {
 	SSMClient SSMClient
 }
 
 // New creates a new service
-func New() (*Service, error) {
+func New() (Service, error) {
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
 	}))
@@ -28,14 +34,14 @@ func New() (*Service, error) {
 }
 
 // NewFromClient creates a new service from an implementation of the SSMClient
-func NewFromClient(ssmClient SSMClient) (*Service, error) {
-	return &Service{
+func NewFromClient(ssmClient SSMClient) (Service, error) {
+	return &Impl{
 		SSMClient: ssmClient,
 	}, nil
 }
 
 // GetParameters fetches all of the parameters under a path into a map
-func (svc *Service) GetParameters(searchPath string) (map[string]string, error) {
+func (svc *Impl) GetParameters(searchPath string) (map[string]string, error) {
 	params := map[string]string{}
 	getParametersByPathInput := &ssm.GetParametersByPathInput{
 		Path:           aws.String(searchPath),
@@ -44,7 +50,7 @@ func (svc *Service) GetParameters(searchPath string) (map[string]string, error) 
 
 	err := svc.SSMClient.GetParametersByPathPages(getParametersByPathInput, func(resp *ssm.GetParametersByPathOutput, lastPage bool) bool {
 		for _, param := range resp.Parameters {
-			name := utils.SSMParameterToEnvVar(*param.Name, searchPath)
+			name := strings.TrimPrefix(*param.Name, fmt.Sprintf("%s/", searchPath))
 			params[name] = *param.Value
 		}
 		return true

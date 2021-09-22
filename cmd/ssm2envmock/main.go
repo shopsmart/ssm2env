@@ -32,7 +32,7 @@ func main() {
 	cmd.Execute(version, svc)
 }
 
-func mockService() (*service.Service, error) {
+func mockService() (service.Service, error) {
 	params := os.Getenv(EnvironmentVariable)
 	if params == "" {
 		return nil, fmt.Errorf("Missing required environment variable: %s", EnvironmentVariable)
