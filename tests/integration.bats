@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
 
-EXECUTABLE="$BATS_TEST_DIRNAME/../bin/ssm2env"
+export TEST_SSM2ENV_EXECUTABLE="${TEST_SSM2ENV_EXECUTABLE:-$BATS_TEST_DIRNAME/../bin/ssm2env}"
 
 load helpers/integration.bash
 
