@@ -86,4 +86,4 @@ jobs:
           TEST_SSM2ENV_EXECUTABLE: bin/ssm2envmock
           TEST_SSM2ENV_INTEGRATION: 0
           TEST_SSM2ENV_INTEGRATION_MOCK_CLIENT: 0
-        run: bats -r 'bats/*.bats'
+        run: bats -r 'tests/*.bats'
