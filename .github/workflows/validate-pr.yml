@@ -32,12 +32,16 @@ jobs:
 
       - name: 'Run unit tests'
         run: go test -v ./...
+        env:
+          AWS_DEFAULT_REGION: us-east-1
 
       - name: 'Install BATS'
         run: brew install bats-core
 
       - name: 'Run integration tests'
         run: bats -r tests/*.bats
+        env:
+          AWS_DEFAULT_REGION: us-east-1
 
   # precommit:
   #   name: 'Run precommit check'
