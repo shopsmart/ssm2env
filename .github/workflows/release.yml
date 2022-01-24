@@ -55,7 +55,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: 'Install dependencies'
-        run: brew install bats-core jq
+        run: brew install bats-core
 
       - name: 'Download artifacts'
         uses: actions/download-artifact@v2
@@ -65,11 +65,8 @@ jobs:
 
       - name: 'Run integration tests'
         env:
-          TEST_SSM2ENV_PREFIX: ${{ secrets.TF_VAR_PREFIX }}
-          TEST_SSM2ENV_PARAMETERS: ${{ secrets.TF_VAR_PARAMETERS }}
           TEST_SSM2ENV_EXECUTABLE: dist/ssm2env_linux_amd64/ssm2env
-          TEST_SSM2ENV_INTEGRATION: 0
-        run: bats -r 'bats/*.bats'
+        run: bats -r bats/*.bats
 
       - name: 'Upload the release assets'
         uses: softprops/action-gh-release@v1

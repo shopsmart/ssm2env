@@ -1,4 +1,4 @@
-package tests_test
+package utils_test
 
 import (
 	"bytes"
@@ -22,6 +22,16 @@ var _ = Describe("Utils", func() {
 		})
 
 		It("Should properly format a map of key values into env format", func() {
+			paramsMap := map[string]string{
+				"foo": "<value-to-be-quoted>",
+				"bar": "contains a single quote y'all",
+				"baz": "uses multiple* special &characters, y'all",
+			}
+			paramsEnvString := `FOO='<value-to-be-quoted>'
+BAR='contains a single quote y'"'"'all'
+BAZ='uses multiple* special &characters, y'"'"'all'
+`
+
 			err := utils.EnvFormat(buffer, paramsMap)
 			Expect(err).Should(BeNil())
 			Expect(buffer.String(), Equal(paramsEnvString))
