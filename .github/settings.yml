@@ -2,7 +2,7 @@
 repository:
   name: ssm2env
   description: 'Pulls SSM Params into env format'
-  private: true # TODO: Make this public for easy download
+  private: false
   has_issues: true
   default_branch: main
   allow_squash_merge: true
