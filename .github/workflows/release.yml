@@ -73,9 +73,10 @@ jobs:
 
       - name: 'Run integration tests'
         env:
-          TEST_SSM2ENV_EXECUTABLE: dist/ssm2env_linux_amd64/ssm2env
+          TEST_SSM2ENV_EXECUTABLE: ./ssm2env
         run: |
-          ls dist/
+          tar -xvzf dist/ssm2env_*_Linux_amd64.tar.gz
+          mv dist/ssm2env_*_Linux_amd64/ssm2env .
           bats -r tests/*.bats
 
       - name: 'Upload the release assets'
