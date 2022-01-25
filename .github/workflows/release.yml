@@ -76,7 +76,6 @@ jobs:
           TEST_SSM2ENV_EXECUTABLE: ./ssm2env
         run: |
           tar -xvzf dist/ssm2env_*_linux_amd64.tar.gz
-          mv dist/ssm2env_*_linux_amd64/ssm2env .
           bats -r tests/*.bats
 
       - name: 'Upload the release assets'
