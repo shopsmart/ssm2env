@@ -74,7 +74,7 @@ jobs:
       - name: 'Run integration tests'
         env:
           TEST_SSM2ENV_EXECUTABLE: dist/ssm2env_linux_amd64/ssm2env
-        run: bats -r bats/*.bats
+        run: bats -r tests/*.bats
 
       - name: 'Upload the release assets'
         uses: softprops/action-gh-release@v1
