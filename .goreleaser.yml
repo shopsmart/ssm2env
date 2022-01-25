@@ -17,6 +17,8 @@ builds:
       - amd64
       - arm64
     main: ./cmd/ssm2env
+    ldflags:
+      - "-X main.version={{ incpatch .Version }}"
 # archives:
 #   - replacements:
 #       darwin: Darwin
