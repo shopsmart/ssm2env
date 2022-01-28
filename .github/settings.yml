@@ -1,7 +1,8 @@
 ---
 repository:
   name: ssm2env
-  private: true # TODO: Make this public for easy download
+  description: 'Pulls SSM Params into env format'
+  private: false
   has_issues: true
   default_branch: main
   allow_squash_merge: true
@@ -21,23 +22,7 @@ branches:
     protection:
       required_pull_request_reviews:
         required_approving_review_count: 1
-        dismiss_stale_reviews: false
-        require_code_owner_reviews: true
-        dismissal_restrictions: {}
-      required_status_checks:
-        strict: true
-        contexts: []
-      enforce_admins: false
-      required_linear_history: true
-      restrictions:
-        users: []
-        teams: []
-        apps: []
-  - name: '*-base'
-    protection:
-      required_pull_request_reviews:
-        required_approving_review_count: 1
-        dismiss_stale_reviews: false
+        dismiss_stale_reviews: true
         require_code_owner_reviews: true
         dismissal_restrictions: {}
       required_status_checks:

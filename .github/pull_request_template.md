@@ -8,8 +8,4 @@
 
 ## Notes
 
-<!-- Link the Asana task here -->
-* [Asana Task]()
-
-<!-- For non-template repos: Reference the owning team to add to all PRs -->
-<!-- Ex: @shopsmart/web-team -->
+<!-- Additional notes and information here -->
