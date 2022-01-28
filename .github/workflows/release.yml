@@ -48,14 +48,15 @@ jobs:
           path: dist/*
 
   integration:
-    name: 'Run integration tests'
+    name: 'Run integration tests and release'
     runs-on: ubuntu-latest
+    needs: build
     steps:
       - name: 'Checkout'
         uses: actions/checkout@v2
 
-      - name: 'Install dependencies'
-        run: brew install bats-core jq
+      - name: 'Install BATS'
+        run: brew install bats-core
 
       - name: 'Download artifacts'
         uses: actions/download-artifact@v2
@@ -63,13 +64,19 @@ jobs:
           name: ssm2env
           path: dist/
 
+      - name: 'Configure AWS credentials'
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
       - name: 'Run integration tests'
         env:
-          TEST_SSM2ENV_PREFIX: ${{ secrets.TF_VAR_PREFIX }}
-          TEST_SSM2ENV_PARAMETERS: ${{ secrets.TF_VAR_PARAMETERS }}
-          TEST_SSM2ENV_EXECUTABLE: dist/ssm2env_linux_amd64/ssm2env
-          TEST_SSM2ENV_INTEGRATION: 0
-        run: bats -r 'bats/*.bats'
+          TEST_SSM2ENV_EXECUTABLE: ./ssm2env
+        run: |
+          tar -xvzf dist/ssm2env_*_linux_amd64.tar.gz
+          bats -r tests/*.bats
 
       - name: 'Upload the release assets'
         uses: softprops/action-gh-release@v1

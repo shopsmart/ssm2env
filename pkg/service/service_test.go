@@ -1,6 +1,8 @@
-package tests_test
+package service_test
 
 import (
+	"fmt"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -8,21 +10,45 @@ import (
 	"github.com/aws/aws-sdk-go/service/ssm"
 	"github.com/golang/mock/gomock"
 
+	"github.com/shopsmart/ssm2env/internal/testutils"
 	"github.com/shopsmart/ssm2env/pkg/service"
-	"github.com/shopsmart/ssm2env/tests/mocks"
 )
+
+var (
+	paramsMap = map[string]string{
+		"foo": "<value-to-be-quoted>",
+		"bar": "contains a single quote y'all",
+		"baz": "uses multiple* special &characters, y'all",
+	}
+
+	paramsSlice []*ssm.Parameter
+)
+
+const (
+	paramsPrefix = "/test/ssm2env"
+)
+
+func init() {
+	paramsSlice = []*ssm.Parameter{}
+	for key, value := range paramsMap {
+		paramsSlice = append(paramsSlice, &ssm.Parameter{
+			Name:  aws.String(fmt.Sprintf("%s/%s", paramsPrefix, key)),
+			Value: aws.String(value),
+		})
+	}
+}
 
 var _ = Describe("Service", func() {
 
 	var (
 		inputPath = "/test/ssm2env"
-		client    *mocks.MockSSMClient
+		client    *testutils.MockSSMClient
 		svc       service.Service
 		err       error
 	)
 
 	BeforeEach(func() {
-		client = mocks.NewMockSSMClient(mockController)
+		client = testutils.NewMockSSMClient(testutils.MockController)
 		svc, err = service.NewFromClient(client)
 		Expect(err).Should(BeNil())
 	})
