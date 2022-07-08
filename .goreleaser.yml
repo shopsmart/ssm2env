@@ -43,3 +43,4 @@ brews:
       owner: shopsmart
       name: homewbrew-tap
       branch: github/template-cleanup
+      folder: Formula
