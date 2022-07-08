@@ -15,8 +15,8 @@ import (
 func New(version string, svc service.Service) *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:   "ssm2env",
-		Short: "Pulls SSM paramters into env format",
-		Long: `SSM2Env pulls paramters from AWS SSM Param Store
+		Short: "Pulls SSM parameters into env format",
+		Long: `SSM2Env pulls parameters from AWS SSM Param Store
 		and puts them in env format
 
 		ssm2env /my/prefix
@@ -35,6 +35,7 @@ func New(version string, svc service.Service) *cobra.Command {
 				return
 			}
 
+			multilineSupport, _ := cmd.Flags().GetBool("multiline")
 			recursive, _ := cmd.Flags().GetBool("recursive")
 
 			validArgs := []string{}
@@ -51,7 +52,13 @@ func New(version string, svc service.Service) *cobra.Command {
 				return
 			}
 
-			err := ssm2env.Collect(svc, os.Stdout, validArgs[0], recursive)
+			cfg := ssm2env.Config{
+				SearchPath:       validArgs[0],
+				Recursive:        recursive,
+				MultilineSupport: multilineSupport,
+			}
+
+			err := ssm2env.Collect(svc, os.Stdout, &cfg)
 			if err != nil {
 				log.Fatal(err)
 				return
@@ -59,6 +66,7 @@ func New(version string, svc service.Service) *cobra.Command {
 		},
 	}
 
+	rootCmd.PersistentFlags().Bool("multiline", true, "enables multiline support; to enable, set --multiline=false")
 	rootCmd.PersistentFlags().Bool("recursive", false, "searches the path recursively")
 	rootCmd.PersistentFlags().Bool("verbose", false, "enables verbose output")
 	rootCmd.PersistentFlags().Bool("version", false, "prints the version and exits")

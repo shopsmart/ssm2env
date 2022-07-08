@@ -25,16 +25,20 @@ var _ = Describe("Ssm2env", func() {
 		buffer *bytes.Buffer
 		svc    service.Service
 		err    error
+		cfg    *ssm2env.Config
 	)
 
 	BeforeEach(func() {
 		buffer = bytes.NewBuffer([]byte{})
 		svc, err = service.New()
 		Expect(err).Should(BeNil())
+		cfg = &ssm2env.Config{
+			SearchPath: Prefix,
+		}
 	})
 
 	It("Should collect the parameters and write the env formatted bytes to the buffer", func() {
-		err = ssm2env.Collect(svc, buffer, Prefix, false)
+		err = ssm2env.Collect(svc, buffer, cfg)
 		Expect(err).Should(BeNil())
 
 		ss := strings.Split(buffer.String(), "\n")
