@@ -42,3 +42,4 @@ brews:
     tap:
       owner: shopsmart
       name: homewbrew-tap
+      branch: github/template-cleanup
