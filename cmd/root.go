@@ -35,6 +35,8 @@ func New(version string, svc service.Service) *cobra.Command {
 				return
 			}
 
+			recursive, _ := cmd.Flags().GetBool("recursive")
+
 			validArgs := []string{}
 			for _, arg := range args {
 				if arg != "" {
@@ -49,7 +51,7 @@ func New(version string, svc service.Service) *cobra.Command {
 				return
 			}
 
-			err := ssm2env.Collect(svc, os.Stdout, validArgs[0])
+			err := ssm2env.Collect(svc, os.Stdout, validArgs[0], recursive)
 			if err != nil {
 				log.Fatal(err)
 				return
@@ -57,6 +59,7 @@ func New(version string, svc service.Service) *cobra.Command {
 		},
 	}
 
+	rootCmd.PersistentFlags().Bool("recursive", false, "searches the path recursively")
 	rootCmd.PersistentFlags().Bool("verbose", false, "enables verbose output")
 	rootCmd.PersistentFlags().Bool("version", false, "prints the version and exits")
 

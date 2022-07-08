@@ -57,6 +57,7 @@ var _ = Describe("Service", func() {
 		in := ssm.GetParametersByPathInput{
 			Path:           aws.String(inputPath),
 			WithDecryption: aws.Bool(true),
+			Recursive:      aws.Bool(false),
 		}
 
 		var _ = in
@@ -74,7 +75,34 @@ var _ = Describe("Service", func() {
 			}).
 			Times(1)
 
-		params, err := svc.GetParameters(inputPath)
+		params, err := svc.GetParameters(inputPath, false)
+		Expect(err).Should(BeNil())
+		Expect(params).Should(Equal(paramsMap))
+	})
+
+	It("Should get the parameters from ssm recursively", func() {
+		in := ssm.GetParametersByPathInput{
+			Path:           aws.String(inputPath),
+			WithDecryption: aws.Bool(true),
+			Recursive:      aws.Bool(true),
+		}
+
+		var _ = in
+
+		client.
+			EXPECT().
+			GetParametersByPathPages(gomock.Any(), gomock.Any()).
+			DoAndReturn(func(_ *ssm.GetParametersByPathInput, fn func(*ssm.GetParametersByPathOutput, bool) bool) error {
+				resp := ssm.GetParametersByPathOutput{
+					NextToken:  nil,
+					Parameters: paramsSlice,
+				}
+				_ = fn(&resp, true)
+				return nil
+			}).
+			Times(1)
+
+		params, err := svc.GetParameters(inputPath, true)
 		Expect(err).Should(BeNil())
 		Expect(params).Should(Equal(paramsMap))
 	})
