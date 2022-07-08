@@ -9,9 +9,17 @@ import (
 	"github.com/shopsmart/ssm2env/pkg/utils"
 )
 
+// Config represents the various configurations for ssm2env
+type Config struct {
+	SearchPath string
+	// Currently conflicts with the recursive feature
+	// Recursive bool
+	MultilineSupport bool
+}
+
 // Collect retrieves the SSM parameters for the given search path and
 // writes to the writer in env format
-func Collect(svc service.Service, w io.Writer, searchPath string) error {
+func Collect(svc service.Service, w io.Writer, cfg *Config) error {
 	var err error
 	if svc == nil {
 		log.Debug("Initializing session")
@@ -21,12 +29,12 @@ func Collect(svc service.Service, w io.Writer, searchPath string) error {
 		}
 	}
 
-	log.Debugf("Getting parameters for search path: %s", searchPath)
-	params, err := svc.GetParameters(searchPath)
+	log.Debugf("Getting parameters for search path: %s", cfg.SearchPath)
+	params, err := svc.GetParameters(cfg.SearchPath)
 	if err != nil {
 		return err
 	}
 
 	log.Debugf("Found %d parameters", len(params))
-	return utils.EnvFormat(w, params)
+	return utils.EnvFormat(w, params, cfg.MultilineSupport)
 }
