@@ -34,7 +34,7 @@ var _ = Describe("Ssm2env", func() {
 	})
 
 	It("Should collect the parameters and write the env formatted bytes to the buffer", func() {
-		err = ssm2env.Collect(svc, buffer, Prefix)
+		err = ssm2env.Collect(svc, buffer, Prefix, false)
 		Expect(err).Should(BeNil())
 
 		ss := strings.Split(buffer.String(), "\n")

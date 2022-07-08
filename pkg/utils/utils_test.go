@@ -23,13 +23,15 @@ var _ = Describe("Utils", func() {
 
 		It("Should properly format a map of key values into env format", func() {
 			paramsMap := map[string]string{
-				"foo": "<value-to-be-quoted>",
-				"bar": "contains a single quote y'all",
-				"baz": "uses multiple* special &characters, y'all",
+				"foo":        "<value-to-be-quoted>",
+				"bar":        "contains a single quote y'all",
+				"baz":        "uses multiple* special &characters, y'all",
+				"nested/foo": "demonstrates recursive sanitization",
 			}
 			paramsEnvString := `FOO='<value-to-be-quoted>'
 BAR='contains a single quote y'"'"'all'
 BAZ='uses multiple* special &characters, y'"'"'all'
+NESTED_FOO='demonstrates recursive sanitization'
 `
 
 			err := utils.EnvFormat(buffer, paramsMap)

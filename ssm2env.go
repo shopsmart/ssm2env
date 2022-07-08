@@ -11,7 +11,7 @@ import (
 
 // Collect retrieves the SSM parameters for the given search path and
 // writes to the writer in env format
-func Collect(svc service.Service, w io.Writer, searchPath string) error {
+func Collect(svc service.Service, w io.Writer, searchPath string, recursive bool) error {
 	var err error
 	if svc == nil {
 		log.Debug("Initializing session")
@@ -21,8 +21,13 @@ func Collect(svc service.Service, w io.Writer, searchPath string) error {
 		}
 	}
 
-	log.Debugf("Getting parameters for search path: %s", searchPath)
-	params, err := svc.GetParameters(searchPath)
+	recursively := ""
+	if recursive {
+		recursively = " recursively"
+	}
+
+	log.Debugf("Getting parameters for search path: %s%s", searchPath, recursively)
+	params, err := svc.GetParameters(searchPath, recursive)
 	if err != nil {
 		return err
 	}
