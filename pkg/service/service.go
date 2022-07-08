@@ -16,7 +16,7 @@ type SSMClient interface {
 
 // Service will abstract out calls to AWS
 type Service interface {
-	GetParameters(searchPath string) (map[string]string, error)
+	GetParameters(searchPath string, recursive bool) (map[string]string, error)
 }
 
 // Impl will be the implementation of the Service interface
@@ -41,11 +41,12 @@ func NewFromClient(ssmClient SSMClient) (Service, error) {
 }
 
 // GetParameters fetches all of the parameters under a path into a map
-func (svc *Impl) GetParameters(searchPath string) (map[string]string, error) {
+func (svc *Impl) GetParameters(searchPath string, recursive bool) (map[string]string, error) {
 	params := map[string]string{}
 	getParametersByPathInput := &ssm.GetParametersByPathInput{
 		Path:           aws.String(searchPath),
 		WithDecryption: aws.Bool(true),
+		Recursive:      aws.Bool(recursive),
 	}
 
 	err := svc.SSMClient.GetParametersByPathPages(getParametersByPathInput, func(resp *ssm.GetParametersByPathOutput, lastPage bool) bool {

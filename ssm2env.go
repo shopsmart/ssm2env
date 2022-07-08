@@ -11,9 +11,8 @@ import (
 
 // Config represents the various configurations for ssm2env
 type Config struct {
-	SearchPath string
-	// Currently conflicts with the recursive feature
-	// Recursive bool
+	SearchPath       string
+	Recursive        bool
 	MultilineSupport bool
 }
 
@@ -29,8 +28,13 @@ func Collect(svc service.Service, w io.Writer, cfg *Config) error {
 		}
 	}
 
-	log.Debugf("Getting parameters for search path: %s", cfg.SearchPath)
-	params, err := svc.GetParameters(cfg.SearchPath)
+	recursively := ""
+	if cfg.Recursive {
+		recursively = " recursively"
+	}
+
+	log.Debugf("Getting parameters for search path: %s%s", cfg.SearchPath, recursively)
+	params, err := svc.GetParameters(cfg.SearchPath, cfg.Recursive)
 	if err != nil {
 		return err
 	}

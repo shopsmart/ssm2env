@@ -36,6 +36,7 @@ func New(version string, svc service.Service) *cobra.Command {
 			}
 
 			multilineSupport, _ := cmd.Flags().GetBool("multiline")
+			recursive, _ := cmd.Flags().GetBool("recursive")
 
 			validArgs := []string{}
 			for _, arg := range args {
@@ -52,8 +53,8 @@ func New(version string, svc service.Service) *cobra.Command {
 			}
 
 			cfg := ssm2env.Config{
-				SearchPath: validArgs[0],
-				// Recursive: recursive,
+				SearchPath:       validArgs[0],
+				Recursive:        recursive,
 				MultilineSupport: multilineSupport,
 			}
 
@@ -66,6 +67,7 @@ func New(version string, svc service.Service) *cobra.Command {
 	}
 
 	rootCmd.PersistentFlags().Bool("multiline", true, "enables multiline support; to enable, set --multiline=false")
+	rootCmd.PersistentFlags().Bool("recursive", false, "searches the path recursively")
 	rootCmd.PersistentFlags().Bool("verbose", false, "enables verbose output")
 	rootCmd.PersistentFlags().Bool("version", false, "prints the version and exits")
 
