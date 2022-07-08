@@ -36,3 +36,9 @@ changelog:
     exclude:
       - '^docs:'
       - '^test:'
+# The Homebrew formula
+brews:
+  - name: ssm2env
+    tap:
+      owner: shopsmart
+      name: homewbrew-tap
