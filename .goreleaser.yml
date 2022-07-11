@@ -42,5 +42,4 @@ brews:
     tap:
       owner: shopsmart
       name: homebrew-ssm2env
-      branch: github/template-cleanup
     folder: Formula
