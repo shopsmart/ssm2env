@@ -1,6 +1,8 @@
 package testutils
 
 import (
+	"sort"
+	"strings"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -19,4 +21,11 @@ func Setup(t *testing.T) {
 // Teardown cleans up after gomock
 func Teardown() {
 	MockController.Finish()
+}
+
+// SortMultilineString sorts a multiline string and assumes the last line is blank
+func SortMultilineString(str string) string {
+	pieces := strings.Split(str, "\n")
+	sort.Strings(pieces[:len(pieces)-1]) // The last line is blank
+	return strings.Join(pieces, "\n")
 }
