@@ -14,6 +14,7 @@ type Config struct {
 	SearchPath       string
 	Recursive        bool
 	MultilineSupport bool
+	Export           bool
 }
 
 // Collect retrieves the SSM parameters for the given search path and
@@ -40,5 +41,5 @@ func Collect(svc service.Service, w io.Writer, cfg *Config) error {
 	}
 
 	log.Debugf("Found %d parameters", len(params))
-	return utils.EnvFormat(w, params, cfg.MultilineSupport)
+	return utils.EnvFormat(w, params, cfg.MultilineSupport, cfg.Export)
 }

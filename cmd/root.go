@@ -37,6 +37,7 @@ func New(version string, svc service.Service) *cobra.Command {
 
 			multilineSupport, _ := cmd.Flags().GetBool("multiline")
 			recursive, _ := cmd.Flags().GetBool("recursive")
+			export, _ := cmd.Flags().GetBool("export")
 
 			validArgs := []string{}
 			for _, arg := range args {
@@ -56,6 +57,7 @@ func New(version string, svc service.Service) *cobra.Command {
 				SearchPath:       validArgs[0],
 				Recursive:        recursive,
 				MultilineSupport: multilineSupport,
+				Export:           export,
 			}
 
 			err := ssm2env.Collect(svc, os.Stdout, &cfg)
@@ -68,6 +70,7 @@ func New(version string, svc service.Service) *cobra.Command {
 
 	rootCmd.PersistentFlags().Bool("multiline", true, "enables multiline support; to enable, set --multiline=false")
 	rootCmd.PersistentFlags().Bool("recursive", false, "searches the path recursively")
+	rootCmd.PersistentFlags().Bool("export", false, "adds export before each variable")
 	rootCmd.PersistentFlags().Bool("verbose", false, "enables verbose output")
 	rootCmd.PersistentFlags().Bool("version", false, "prints the version and exits")
 

@@ -34,7 +34,7 @@ BAZ='uses multiple* special &characters, y'"'"'all'
 NESTED_FOO='demonstrates recursive sanitization'
 `
 
-			err := utils.EnvFormat(buffer, paramsMap, true)
+			err := utils.EnvFormat(buffer, paramsMap, true, false)
 			Expect(err).Should(BeNil())
 			Expect(buffer.String()).Should(Equal(paramsEnvString))
 		})
@@ -52,7 +52,7 @@ containing many, many, many words
 '
 `
 
-			err := utils.EnvFormat(buffer, paramsMap, true)
+			err := utils.EnvFormat(buffer, paramsMap, true, false)
 			Expect(err).Should(BeNil())
 			Expect(buffer.String()).Should(Equal(paramsEnvString))
 		})
@@ -67,7 +67,25 @@ containing many, many, many words
 			paramsEnvString := `FOO='multiline value\nit could be over multiple lines\ncontaining many, many, many words\n'
 `
 
-			err := utils.EnvFormat(buffer, paramsMap, false)
+			err := utils.EnvFormat(buffer, paramsMap, false, false)
+			Expect(err).Should(BeNil())
+			Expect(buffer.String()).Should(Equal(paramsEnvString))
+		})
+
+		It("Should prefix with export if enabled", func() {
+			paramsMap := map[string]string{
+				"foo": `multiline value
+it could be over multiple lines
+containing many, many, many words
+`,
+			}
+			paramsEnvString := `export FOO='multiline value
+it could be over multiple lines
+containing many, many, many words
+'
+`
+
+			err := utils.EnvFormat(buffer, paramsMap, true, true)
 			Expect(err).Should(BeNil())
 			Expect(buffer.String()).Should(Equal(paramsEnvString))
 		})
