@@ -6,6 +6,9 @@ on:
     tags:
       - v*
 
+permissions:
+  contents: write # publish release assets
+
 defaults:
   run:
     shell: bash
