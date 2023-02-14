@@ -2,8 +2,6 @@ package ssm2env_test
 
 import (
 	"bytes"
-	"sort"
-	"strings"
 
 	_ "embed"
 
@@ -11,6 +9,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/shopsmart/ssm2env"
+	"github.com/shopsmart/ssm2env/internal/testutils"
 	"github.com/shopsmart/ssm2env/pkg/service"
 )
 
@@ -41,9 +40,7 @@ var _ = Describe("Ssm2env", func() {
 		err = ssm2env.Collect(svc, buffer, cfg)
 		Expect(err).Should(BeNil())
 
-		ss := strings.Split(buffer.String(), "\n")
-		sort.Strings(ss[:len(ss)-1]) // The last line is blank
-		sorted := strings.Join(ss, "\n")
+		sorted := testutils.SortMultilineString(buffer.String())
 
 		Expect(sorted).Should(Equal(RegionsEnv))
 	})
