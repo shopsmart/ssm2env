@@ -77,16 +77,17 @@ func New(version string, svc service.Service) *cobra.Command {
 		},
 	}
 
-	rootCmd.PersistentFlags().Bool("multiline", true, "enables multiline support; to enable, set --multiline=false")
-	rootCmd.PersistentFlags().Bool("recursive", false, "searches the path recursively")
-	rootCmd.PersistentFlags().Bool("export", false, "adds export before each variable")
-	rootCmd.PersistentFlags().Bool("verbose", false, "enables verbose output")
-	rootCmd.PersistentFlags().Bool("version", false, "prints the version and exits")
+	rootCmd.Flags().Bool("multiline", true, "enables multiline support; to enable, set --multiline=false")
+	rootCmd.Flags().Bool("recursive", false, "searches the path recursively")
+	rootCmd.Flags().Bool("export", false, "adds export before each variable")
+	rootCmd.Flags().Bool("verbose", false, "enables verbose output")
+	rootCmd.Flags().Bool("version", false, "prints the version and exits")
 
 	_ = config.BindPFlag("multiline", rootCmd.Flags().Lookup("multiline"))
 	_ = config.BindPFlag("recursive", rootCmd.Flags().Lookup("recursive"))
 	_ = config.BindPFlag("export", rootCmd.Flags().Lookup("export"))
 	_ = config.BindPFlag("verbose", rootCmd.Flags().Lookup("verbose"))
+	_ = config.BindPFlag("version", rootCmd.Flags().Lookup("version"))
 
 	_ = config.BindEnv("path")
 	_ = config.BindEnv("multiline")
