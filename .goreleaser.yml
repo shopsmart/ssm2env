@@ -7,7 +7,9 @@ before:
     # you may remove this if you don't need go generate
     # - go generate ./...
 builds:
-  - env:
+  - &build
+    id: default
+    env:
       - CGO_ENABLED=0
     goos:
       - linux
@@ -19,6 +21,11 @@ builds:
     main: ./cmd/ssm2env
     ldflags:
       - "-X main.version={{ incpatch .Version }}"
+  - <<: *build
+    id: lambda
+    binary: bin/ssm2env
+    goos:
+     - linux
 # archives:
 #   - replacements:
 #       darwin: Darwin
@@ -43,3 +50,17 @@ brews:
       owner: shopsmart
       name: homebrew-ssm2env
     folder: Formula
+    ids:
+      - default
+archives:
+  - builds:
+      - default
+  - id: lambda
+    format: zip
+    builds:
+      - lambda
+    files:
+      - src: lambda/extensions/*
+        dst: extensions/
+        strip_parent: true
+    name_template: "{{ .ProjectName }}-lambda-layer_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
