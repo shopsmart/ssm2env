@@ -60,7 +60,6 @@ archives:
     builds:
       - lambda
     files:
-      - src: lambda/extensions/*
-        dst: extensions/
+      - src: lambda/*
         strip_parent: true
     name_template: "{{ .ProjectName }}-lambda-layer_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
