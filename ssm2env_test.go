@@ -2,11 +2,14 @@ package ssm2env_test
 
 import (
 	"bytes"
+	"encoding/json"
 
 	_ "embed"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+
+	"github.com/spf13/viper"
 
 	"github.com/shopsmart/ssm2env"
 	"github.com/shopsmart/ssm2env/internal/testutils"
@@ -15,8 +18,23 @@ import (
 
 const Prefix = "/aws/service/global-infrastructure/regions"
 
-//go:embed tests/expected.env
-var RegionsEnv string
+var (
+	//go:embed tests/expected.env
+	RegionsEnv string
+
+	//go:embed tests/regions.json
+	RegionsJSON []byte
+
+	RegionsMap map[string]interface{}
+)
+
+func init() {
+	RegionsMap = map[string]interface{}{}
+	err := json.Unmarshal(RegionsJSON, &RegionsMap)
+	if err != nil {
+		panic(err)
+	}
+}
 
 var _ = Describe("Ssm2env", func() {
 
@@ -43,6 +61,17 @@ var _ = Describe("Ssm2env", func() {
 		sorted := testutils.SortMultilineString(buffer.String())
 
 		Expect(sorted).Should(Equal(RegionsEnv))
+	})
+
+	It("Should load the SSM parameters into a viper config", func() {
+		v := viper.New()
+
+		err = ssm2env.LoadViper(svc, v, Prefix, false)
+		Expect(err).Should(BeNil())
+
+		actual := v.AllSettings()
+
+		Expect(actual).Should(Equal(RegionsMap))
 	})
 
 })

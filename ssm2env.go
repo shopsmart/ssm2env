@@ -4,6 +4,7 @@ import (
 	"io"
 
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 
 	"github.com/shopsmart/ssm2env/pkg/service"
 	"github.com/shopsmart/ssm2env/pkg/utils"
@@ -42,4 +43,28 @@ func Collect(svc service.Service, w io.Writer, cfg *Config) error {
 
 	log.Debugf("Found %d parameters", len(params))
 	return utils.EnvFormat(w, params, cfg.MultilineSupport, cfg.Export)
+}
+
+// LoadViper loads SSM parameters into a viper instance
+func LoadViper(svc service.Service, v *viper.Viper, searchPath string, recursive bool) error {
+	var err error
+	if svc == nil {
+		log.Debug("Initializing session")
+		svc, err = service.New()
+		if err != nil {
+			return err
+		}
+	}
+
+	params, err := svc.GetParameters(searchPath, recursive)
+	if err != nil {
+		return err
+	}
+
+	for key, value := range params {
+		key = utils.EscapeKey(key)
+		v.Set(key, value)
+	}
+
+	return nil
 }

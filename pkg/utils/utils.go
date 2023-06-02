@@ -19,10 +19,15 @@ func init() {
 	newlineRe = regexp.MustCompile(`\r?\n`)
 }
 
+// EscapeKey will return an escaped string with only letters, numbers, and anything else an underscore
+func EscapeKey(key string) string {
+	return keyRe.ReplaceAllString(key, "_")
+}
+
 // EnvFormat will write the map of parameters into the write in env format
 func EnvFormat(w io.Writer, m map[string]string, multilineSupport bool, export bool) error {
 	for key, value := range m {
-		escapedKey := keyRe.ReplaceAllString(key, "_")
+		escapedKey := EscapeKey(key)
 
 		escapedValue := shellescape.Quote(value)
 		if !multilineSupport {
