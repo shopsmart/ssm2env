@@ -13,7 +13,6 @@ import (
 
 	"github.com/shopsmart/ssm2env"
 	"github.com/shopsmart/ssm2env/internal/testutils"
-	"github.com/shopsmart/ssm2env/pkg/service"
 )
 
 const Prefix = "/aws/service/global-infrastructure/regions"
@@ -40,14 +39,12 @@ var _ = Describe("Ssm2env", func() {
 
 	var (
 		buffer *bytes.Buffer
-		svc    service.Service
 		err    error
 		cfg    *ssm2env.Config
 	)
 
 	BeforeEach(func() {
 		buffer = bytes.NewBuffer([]byte{})
-		svc, err = service.New()
 		Expect(err).Should(BeNil())
 		cfg = &ssm2env.Config{
 			SearchPath: Prefix,
@@ -55,7 +52,7 @@ var _ = Describe("Ssm2env", func() {
 	})
 
 	It("Should collect the parameters and write the env formatted bytes to the buffer", func() {
-		err = ssm2env.Collect(svc, buffer, cfg)
+		err = ssm2env.Collect(buffer, cfg)
 		Expect(err).Should(BeNil())
 
 		sorted := testutils.SortMultilineString(buffer.String())
@@ -66,7 +63,7 @@ var _ = Describe("Ssm2env", func() {
 	It("Should load the SSM parameters into a viper config", func() {
 		v := viper.New()
 
-		err = ssm2env.LoadViper(svc, v, Prefix, false)
+		err = ssm2env.LoadViper(v, Prefix, false)
 		Expect(err).Should(BeNil())
 
 		actual := v.AllSettings()

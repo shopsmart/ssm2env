@@ -20,14 +20,10 @@ type Config struct {
 
 // Collect retrieves the SSM parameters for the given search path and
 // writes to the writer in env format
-func Collect(svc service.Service, w io.Writer, cfg *Config) error {
-	var err error
-	if svc == nil {
-		log.Debug("Initializing session")
-		svc, err = service.New()
-		if err != nil {
-			return err
-		}
+func Collect(w io.Writer, cfg *Config) error {
+	svc, err := service.New()
+	if err != nil {
+		return err
 	}
 
 	recursively := ""
@@ -46,14 +42,10 @@ func Collect(svc service.Service, w io.Writer, cfg *Config) error {
 }
 
 // LoadViper loads SSM parameters into a viper instance
-func LoadViper(svc service.Service, v *viper.Viper, searchPath string, recursive bool) error {
-	var err error
-	if svc == nil {
-		log.Debug("Initializing session")
-		svc, err = service.New()
-		if err != nil {
-			return err
-		}
+func LoadViper(v *viper.Viper, searchPath string, recursive bool) error {
+	svc, err := service.New()
+	if err != nil {
+		return err
 	}
 
 	params, err := svc.GetParameters(searchPath, recursive)

@@ -9,11 +9,10 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/shopsmart/ssm2env"
-	"github.com/shopsmart/ssm2env/pkg/service"
 )
 
 // New creates a new cobra command for the given version
-func New(version string, svc service.Service) *cobra.Command {
+func New(version string) *cobra.Command {
 	config := viper.New()
 	config.SetEnvPrefix("ssm2env")
 
@@ -69,7 +68,7 @@ func New(version string, svc service.Service) *cobra.Command {
 				Export:           export,
 			}
 
-			err := ssm2env.Collect(svc, os.Stdout, &cfg)
+			err := ssm2env.Collect(os.Stdout, &cfg)
 			if err != nil {
 				log.Fatal(err)
 				return
@@ -100,8 +99,8 @@ func New(version string, svc service.Service) *cobra.Command {
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute(version string, svc service.Service) {
-	cmd := New(version, svc)
+func Execute(version string) {
+	cmd := New(version)
 
 	if err := cmd.Execute(); err != nil {
 		fmt.Println(err)
