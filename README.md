@@ -3,6 +3,6 @@
 ## Installation
 
 ```bash
-brew tap shopsmart/homebrew-ssm2env
+brew tap shopsmart/ssm2env
 brew install ssm2env
 ```

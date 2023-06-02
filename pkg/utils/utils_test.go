@@ -35,7 +35,7 @@ FOO='<value-to-be-quoted>'
 NESTED_FOO='demonstrates recursive sanitization'
 `
 
-			err := utils.EnvFormat(buffer, paramsMap, true, false)
+			err := utils.WriteEnv(buffer, paramsMap, true, false)
 			Expect(err).Should(BeNil())
 
 			sorted := testutils.SortMultilineString(buffer.String())
@@ -55,7 +55,7 @@ containing many, many, many words
 '
 `
 
-			err := utils.EnvFormat(buffer, paramsMap, true, false)
+			err := utils.WriteEnv(buffer, paramsMap, true, false)
 			Expect(err).Should(BeNil())
 			Expect(buffer.String()).Should(Equal(paramsEnvString))
 		})
@@ -70,7 +70,7 @@ containing many, many, many words
 			paramsEnvString := `FOO='multiline value\nit could be over multiple lines\ncontaining many, many, many words\n'
 `
 
-			err := utils.EnvFormat(buffer, paramsMap, false, false)
+			err := utils.WriteEnv(buffer, paramsMap, false, false)
 			Expect(err).Should(BeNil())
 			Expect(buffer.String()).Should(Equal(paramsEnvString))
 		})
@@ -88,7 +88,7 @@ containing many, many, many words
 '
 `
 
-			err := utils.EnvFormat(buffer, paramsMap, true, true)
+			err := utils.WriteEnv(buffer, paramsMap, true, true)
 			Expect(err).Should(BeNil())
 			Expect(buffer.String()).Should(Equal(paramsEnvString))
 		})
