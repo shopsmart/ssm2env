@@ -20,7 +20,7 @@ type Config struct {
 }
 
 // ConfigFromEnv returns a config that pulls configurations from environment variables
-func ConfigFromEnv(path string) *Config {
+func ConfigFromEnv() *Config {
 	v := viper.New()
 	v.SetEnvPrefix("ssm2env")
 
@@ -28,10 +28,6 @@ func ConfigFromEnv(path string) *Config {
 	_ = v.BindEnv("multiline")
 	_ = v.BindEnv("recursive")
 	_ = v.BindEnv("export")
-
-	if path != "" {
-		v.Set("path", path)
-	}
 
 	return &Config{
 		SearchPath:       v.GetString("path"),
