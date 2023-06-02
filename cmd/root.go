@@ -68,7 +68,7 @@ func New(version string) *cobra.Command {
 				Export:           export,
 			}
 
-			err := ssm2env.Collect(os.Stdout, &cfg)
+			err := ssm2env.WriteEnv(os.Stdout, &cfg)
 			if err != nil {
 				log.Fatal(err)
 				return

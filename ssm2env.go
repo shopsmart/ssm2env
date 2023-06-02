@@ -2,6 +2,7 @@ package ssm2env
 
 import (
 	"io"
+	"os"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -18,45 +19,77 @@ type Config struct {
 	Export           bool
 }
 
-// Collect retrieves the SSM parameters for the given search path and
-// writes to the writer in env format
-func Collect(w io.Writer, cfg *Config) error {
+// ConfigFromEnv returns a config that pulls configurations from environment variables
+func ConfigFromEnv(path string) *Config {
+	v := viper.New()
+	v.SetEnvPrefix("ssm2env")
+
+	_ = v.BindEnv("path")
+	_ = v.BindEnv("multiline")
+	_ = v.BindEnv("recursive")
+	_ = v.BindEnv("export")
+
+	if path != "" {
+		v.Set("path", path)
+	}
+
+	return &Config{
+		SearchPath:       v.GetString("path"),
+		Recursive:        v.GetBool("recursive"),
+		MultilineSupport: v.GetBool("multiline"),
+		Export:           v.GetBool("export"),
+	}
+}
+
+// Get SSM parameters and then pass to the do function
+func getParametersAndDo(searchPath string, recursive bool, do func(map[string]string) error) error {
 	svc, err := service.New()
 	if err != nil {
 		return err
 	}
 
 	recursively := ""
-	if cfg.Recursive {
+	if recursive {
 		recursively = " recursively"
 	}
 
-	log.Debugf("Getting parameters for search path: %s%s", cfg.SearchPath, recursively)
-	params, err := svc.GetParameters(cfg.SearchPath, cfg.Recursive)
-	if err != nil {
-		return err
-	}
-
-	log.Debugf("Found %d parameters", len(params))
-	return utils.EnvFormat(w, params, cfg.MultilineSupport, cfg.Export)
-}
-
-// LoadViper loads SSM parameters into a viper instance
-func LoadViper(v *viper.Viper, searchPath string, recursive bool) error {
-	svc, err := service.New()
-	if err != nil {
-		return err
-	}
-
+	log.Debugf("Getting parameters for search path: %s%s", searchPath, recursively)
 	params, err := svc.GetParameters(searchPath, recursive)
 	if err != nil {
 		return err
 	}
 
-	for key, value := range params {
-		key = utils.EscapeKey(key)
-		v.Set(key, value)
-	}
+	log.Debugf("Found %d parameters", len(params))
+	return do(params)
+}
 
-	return nil
+// WriteEnv retrieves the SSM parameters for the given search path and writes to the writer in env format
+func WriteEnv(w io.Writer, cfg *Config) error {
+	return getParametersAndDo(cfg.SearchPath, cfg.Recursive, func(params map[string]string) error {
+		return utils.WriteEnv(w, params, cfg.MultilineSupport, cfg.Export)
+	})
+}
+
+// LoadEnv loads SSM parameters directly into the environment
+func LoadEnv(cfg *Config) error {
+	return getParametersAndDo(cfg.SearchPath, cfg.Recursive, func(params map[string]string) error {
+		for key, value := range params {
+			key, value = utils.EnvFormat(key, value)
+			os.Setenv(key, value)
+		}
+
+		return nil
+	})
+}
+
+// LoadViper loads SSM parameters into a viper instance
+func LoadViper(v *viper.Viper, cfg *Config) error {
+	return getParametersAndDo(cfg.SearchPath, cfg.Recursive, func(params map[string]string) error {
+		for key, value := range params {
+			key = utils.EscapeKey(key)
+			v.Set(key, value)
+		}
+
+		return nil
+	})
 }

@@ -3,6 +3,8 @@ package ssm2env_test
 import (
 	"bytes"
 	"encoding/json"
+	"os"
+	"strings"
 
 	_ "embed"
 
@@ -52,7 +54,7 @@ var _ = Describe("Ssm2env", func() {
 	})
 
 	It("Should collect the parameters and write the env formatted bytes to the buffer", func() {
-		err = ssm2env.Collect(buffer, cfg)
+		err = ssm2env.WriteEnv(buffer, cfg)
 		Expect(err).Should(BeNil())
 
 		sorted := testutils.SortMultilineString(buffer.String())
@@ -60,10 +62,20 @@ var _ = Describe("Ssm2env", func() {
 		Expect(sorted).Should(Equal(RegionsEnv))
 	})
 
+	It("Should load the SSM parameters into the environment", func() {
+		err = ssm2env.LoadEnv(cfg)
+		Expect(err).Should(BeNil())
+
+		for key, expected := range RegionsMap {
+			actual := os.Getenv(strings.ToUpper(key))
+			Expect(actual).Should(Equal(expected))
+		}
+	})
+
 	It("Should load the SSM parameters into a viper config", func() {
 		v := viper.New()
 
-		err = ssm2env.LoadViper(v, Prefix, false)
+		err = ssm2env.LoadViper(v, cfg)
 		Expect(err).Should(BeNil())
 
 		actual := v.AllSettings()

@@ -1,6 +1,8 @@
 # SSM2ENV Lambda Layer
 
-We can create an ssm2env lambda layer which will run the ssm2env cli to export all environment variables into the lambda prior to the actual lambda being run.  This will use the `SSM2ENV_PATH` environment variable to determine where to pull variables from.  All `SSM2ENV_` environment variables can be set to configure the cli *except* export which is necessary for the layer to work.
+The `provided.al2` runtime does not support wrapper scripts.  Please import `github.com/shopsmart/ssm2env` into your golang lambdas to make use of ssm2env.
+
+For non `provided.al2`, ee can create an ssm2env lambda layer which will run the ssm2env cli to export all environment variables into the lambda prior to the actual lambda being run.  This will use the `SSM2ENV_PATH` environment variable to determine where to pull variables from.  All `SSM2ENV_` environment variables can be set to configure the cli *except* export which is necessary for the layer to work.
 
 **You must set the `AWS_LAMBDA_EXEC_WRAPPER` environment variable in your lambda to `/opt/ssm2env-wrapper.sh`**
 
