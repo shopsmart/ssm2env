@@ -1,38 +1,34 @@
+# @see https://pre-commit.com/
+---
 repos:
-- repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v3.4.0
-  hooks:
-  - id: check-byte-order-marker
-  - id: check-case-conflict
-  - id: check-executables-have-shebangs
-  - id: check-json
-  - id: check-merge-conflict
-  - id: check-symlinks
-  - id: check-yaml
-  - id: destroyed-symlinks
-  - id: detect-aws-credentials
-    args: [--allow-missing-credentials]
-  - id: detect-private-key
-  - id: end-of-file-fixer
-  - id: no-commit-to-branch
-    args: [--branch, main]
-  - id: pretty-format-json
-    args: [--autofix, --no-sort-keys, --indent=4]
-  - id: trailing-whitespace
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.4.0
+    hooks:
+      - id: check-byte-order-marker
+      - id: check-case-conflict
+      - id: check-executables-have-shebangs
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: check-yaml
+      - id: destroyed-symlinks
+      - id: detect-aws-credentials
+        args: [--allow-missing-credentials]
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: no-commit-to-branch
+        args: [--branch, main]
+      - id: pretty-format-json
+        args: [--autofix, --no-sort-keys, --indent=4]
+      - id: trailing-whitespace
 
-- repo: https://github.com/dnephin/pre-commit-golang
-  rev: ac0f6582d2484b3aa90b05d568e70f9f3c1374c7 # The owner of this repo has not released new tags
-  hooks:
-    - id: go-fmt
-    - id: go-vet
-    - id: go-lint
-    - id: go-imports
-    - id: go-cyclo
-      args: [-over=15]
-    - id: validate-toml
-    - id: no-go-testing
-    - id: golangci-lint
-    # - id: go-critic
-    - id: go-unit-tests
-    - id: go-build
-    - id: go-mod-tidy
+  # Go hooks
+  - repo: https://github.com/tekwizely/pre-commit-golang
+    rev: 302c7fd28cdbb62d5fd1e3965fe36e33a5f77803
+    hooks:
+      - id: go-build-mod
+      - id: go-mod-tidy
+      - id: go-test-mod
+      - id: go-imports
+      - id: go-fmt
+      - id: go-critic
