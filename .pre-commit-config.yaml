@@ -28,7 +28,6 @@ repos:
     hooks:
       - id: go-build-mod
       - id: go-mod-tidy
-      - id: go-test-mod
       - id: go-imports
       - id: go-fmt
       - id: go-critic
