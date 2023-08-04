@@ -1,14 +1,6 @@
 #!/usr/bin/env make
 
-test-fixtures:
-	# Validate authentication
-	aws sts get-caller-identity --no-cli-pager >/dev/null
-
-	# Generate tests/regions.json
-	@$(MAKE) tests/regions.json
-
-	# Generate tests/expected.env
-	@$(MAKE) tests/expected.env
+test-fixtures: tests/regions.json tests/expected.env
 
 .PHONY: tests/regions.json # Forces rebuild
 tests/regions.json:
