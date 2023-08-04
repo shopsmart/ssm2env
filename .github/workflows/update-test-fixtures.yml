@@ -38,7 +38,9 @@ jobs:
 
       - name: 'Throw an error if the files changed'
         if: github.event_name == 'pull_request'
-        run: '[[ $(git status --porcelain | wc -l) -eq 0 ]]'
+        run: |
+          git diff
+          [[ $(git status --porcelain | wc -l) -eq 0 ]]
 
       - name: 'Get datetime'
         id: datetime
