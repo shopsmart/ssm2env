@@ -18,5 +18,6 @@ tests/expected.env:
 		--path /aws/service/global-infrastructure/regions \
 		--no-cli-pager \
 		--query 'sort_by(Parameters, &Name)[].{key:Value,value:Value}' | \
-		jq -r '.[] | "\(.key | sub("-"; "_"; "g") | ascii_upcase)=\(.value)"' \
+		jq -r '.[] | "\(.key | sub("-"; "_"; "g") | ascii_upcase)=\(.value)"' | \
+		sort \
 	> tests/expected.env
