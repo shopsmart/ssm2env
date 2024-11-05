@@ -14,7 +14,8 @@ on:
       - tests/regions.json
 
 permissions:
-  contents: write # publish PRs
+  contents: read
+  pull-requests: write # publish PRs
 
 defaults:
   run:
