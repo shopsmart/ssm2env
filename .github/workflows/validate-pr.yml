@@ -55,10 +55,11 @@ jobs:
           go-version-file: go.mod
           cache-file: go.sum
 
-      - name: 'Install dependencies'
-        run: |
-          go install -v github.com/go-critic/go-critic/cmd/gocritic@latest
-          go install golang.org/x/tools/cmd/goimports@latest
+      - name: 'Setup brew'
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: 'Install dev dependencies'
+        run: brew bundle install
 
       - name: 'Run pre-commit check'
         uses: pre-commit/action@v3.0.0
