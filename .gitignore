@@ -18,6 +18,10 @@ vendor/
 
 ## General ignore
 
+# Brewfile does not actuall use the lock and will update
+# the dependencies everytime no matter what
+Brewfile.lock.json
+
 # Environment variables
 .env
 

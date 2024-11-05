@@ -55,8 +55,11 @@ jobs:
           go-version-file: go.mod
           cache-file: go.sum
 
-      - name: 'Install go tools'
-        run: while read -r tool; do go install -v "$tool"; done <go.tools
+      - name: 'Setup brew'
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: 'Install dev dependencies'
+        run: brew bundle install
 
       - name: 'Run pre-commit check'
         uses: pre-commit/action@v3.0.0
