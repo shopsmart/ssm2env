@@ -72,16 +72,16 @@ func (m *MockService) EXPECT() *MockServiceMockRecorder {
 }
 
 // GetParameters mocks base method.
-func (m *MockService) GetParameters(searchPath string) (map[string]string, error) {
+func (m *MockService) GetParameters(searchPath string, recursive bool) (map[string]string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetParameters", searchPath)
+	ret := m.ctrl.Call(m, "GetParameters", searchPath, recursive)
 	ret0, _ := ret[0].(map[string]string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetParameters indicates an expected call of GetParameters.
-func (mr *MockServiceMockRecorder) GetParameters(searchPath interface{}) *gomock.Call {
+func (mr *MockServiceMockRecorder) GetParameters(searchPath, recursive interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetParameters", reflect.TypeOf((*MockService)(nil).GetParameters), searchPath)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetParameters", reflect.TypeOf((*MockService)(nil).GetParameters), searchPath, recursive)
 }
