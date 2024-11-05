@@ -2,7 +2,7 @@ package ssm2env_test
 
 import (
 	"bytes"
-	"encoding/json"
+	"fmt"
 	"os"
 	"strings"
 
@@ -10,64 +10,88 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-
 	"github.com/spf13/viper"
+	"gopkg.in/alessio/shellescape.v1"
 
 	"github.com/shopsmart/ssm2env"
 	"github.com/shopsmart/ssm2env/internal/testutils"
 )
 
-const Prefix = "/aws/service/global-infrastructure/regions"
+const MultilineString = `This is a multiline string.
+There are six lines to this string.
 
-var (
-	//go:embed tests/expected.env
-	RegionsEnv string
-
-	//go:embed tests/regions.json
-	RegionsJSON []byte
-
-	RegionsMap map[string]interface{}
-)
-
-func init() {
-	RegionsMap = map[string]interface{}{}
-	err := json.Unmarshal(RegionsJSON, &RegionsMap)
-	if err != nil {
-		panic(err)
-	}
-}
+A blank line was placed above this one and at the end.
+This line has special characters: $({&*"'\}).
+`
 
 var _ = Describe("Ssm2env", func() {
 
 	var (
-		buffer *bytes.Buffer
-		err    error
-		cfg    *ssm2env.Config
+		err error
+		cfg *ssm2env.Config
+		svc *testutils.MockService
+
+		searchPath = "/does/not/matter"
+		parameters = map[string]string{
+			"Foo":                 "Bar",
+			"includes-dashes-187": "foo",
+			"special-<£#1":        "yes",
+			"multiline":           MultilineString,
+		}
+		// singleLine = strings.ReplaceAll(MultilineString, "\n", "\\n")
+		envVars = map[string]string{
+			"FOO":                 "Bar",
+			"INCLUDES_DASHES_187": "foo",
+			"SPECIAL____1":        "yes",
+			"MULTILINE":           MultilineString,
+		}
+		viperMap = map[string]interface{}{
+			"foo":                 "Bar",
+			"includes_dashes_187": "foo",
+			"special____1":        "yes",
+			"multiline":           MultilineString,
+		}
 	)
 
 	BeforeEach(func() {
-		buffer = bytes.NewBuffer([]byte{})
 		Expect(err).Should(BeNil())
 		cfg = &ssm2env.Config{
-			SearchPath: Prefix,
+			SearchPath:       searchPath,
+			Recursive:        false,
+			MultilineSupport: true,
 		}
+		svc = testutils.NewMockService(testutils.MockController)
+
+		svc.
+			EXPECT().
+			GetParameters(searchPath, false).
+			Return(parameters, nil).
+			Times(1)
 	})
 
 	It("Should collect the parameters and write the env formatted bytes to the buffer", func() {
-		err = ssm2env.WriteEnv(buffer, cfg)
+		var expected []string
+		for key, value := range envVars {
+			expected = append(expected, fmt.Sprintf("%s=%s\n", key, shellescape.Quote(value)))
+		}
+
+		buffer := bytes.NewBuffer([]byte{})
+
+		err = ssm2env.WriteEnvWithService(svc, buffer, cfg)
 		Expect(err).Should(BeNil())
 
-		sorted := testutils.SortMultilineString(buffer.String())
-
-		Expect(sorted).Should(Equal(RegionsEnv))
+		lines := strings.Split(buffer.String(), "\n")
+		for _, line := range lines {
+			Expect(lines).Should(ContainElement(line))
+		}
 	})
 
 	It("Should load the SSM parameters into the environment", func() {
-		err = ssm2env.LoadEnv(cfg)
+		err = ssm2env.LoadEnvWithService(svc, cfg)
 		Expect(err).Should(BeNil())
 
-		for key, expected := range RegionsMap {
-			actual := os.Getenv(strings.ToUpper(key))
+		for key, expected := range envVars {
+			actual := os.Getenv(key)
 			Expect(actual).Should(Equal(expected))
 		}
 	})
@@ -75,12 +99,11 @@ var _ = Describe("Ssm2env", func() {
 	It("Should load the SSM parameters into a viper config", func() {
 		v := viper.New()
 
-		err = ssm2env.LoadViper(v, cfg)
+		err = ssm2env.LoadViperWithService(svc, v, cfg)
 		Expect(err).Should(BeNil())
 
 		actual := v.AllSettings()
 
-		Expect(actual).Should(Equal(RegionsMap))
+		Expect(actual).Should(Equal(viperMap))
 	})
-
 })

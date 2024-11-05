@@ -24,9 +24,13 @@ func EscapeKey(key string) string {
 	return keyRe.ReplaceAllString(key, "_")
 }
 
+func EnvKey(key string) string {
+	return strings.ToUpper(EscapeKey(key))
+}
+
 // EnvFormat will write the map of parameters into the write in env format
 func EnvFormat(key string, value string) (string, string) {
-	return strings.ToUpper(EscapeKey(key)), shellescape.Quote(value)
+	return EnvKey(key), shellescape.Quote(value)
 }
 
 // WriteEnv will write the environment variables in env format to the writer
