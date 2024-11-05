@@ -38,12 +38,7 @@ func ConfigFromEnv() *Config {
 }
 
 // Get SSM parameters and then pass to the do function
-func getParametersAndDo(searchPath string, recursive bool, do func(map[string]string) error) error {
-	svc, err := service.New()
-	if err != nil {
-		return err
-	}
-
+func getParametersAndDo(svc service.Service, searchPath string, recursive bool, do func(map[string]string) error) error {
 	recursively := ""
 	if recursive {
 		recursively = " recursively"
@@ -61,17 +56,36 @@ func getParametersAndDo(searchPath string, recursive bool, do func(map[string]st
 
 // WriteEnv retrieves the SSM parameters for the given search path and writes to the writer in env format
 func WriteEnv(w io.Writer, cfg *Config) error {
-	return getParametersAndDo(cfg.SearchPath, cfg.Recursive, func(params map[string]string) error {
+	svc, err := service.New()
+	if err != nil {
+		return err
+	}
+
+	return WriteEnvWithService(svc, w, cfg)
+}
+
+// WriteEnvWithService retrieves the SSM parameters for the given search path and writes to the writer in env format
+func WriteEnvWithService(svc service.Service, w io.Writer, cfg *Config) error {
+	return getParametersAndDo(svc, cfg.SearchPath, cfg.Recursive, func(params map[string]string) error {
 		return utils.WriteEnv(w, params, cfg.MultilineSupport, cfg.Export)
 	})
 }
 
 // LoadEnv loads SSM parameters directly into the environment
 func LoadEnv(cfg *Config) error {
-	return getParametersAndDo(cfg.SearchPath, cfg.Recursive, func(params map[string]string) error {
+	svc, err := service.New()
+	if err != nil {
+		return err
+	}
+
+	return LoadEnvWithService(svc, cfg)
+}
+
+// LoadEnvWithService loads SSM parameters directly into the environment
+func LoadEnvWithService(svc service.Service, cfg *Config) error {
+	return getParametersAndDo(svc, cfg.SearchPath, cfg.Recursive, func(params map[string]string) error {
 		for key, value := range params {
-			key, value = utils.EnvFormat(key, value)
-			os.Setenv(key, value)
+			os.Setenv(utils.EnvKey(key), value)
 		}
 
 		return nil
@@ -80,10 +94,19 @@ func LoadEnv(cfg *Config) error {
 
 // LoadViper loads SSM parameters into a viper instance
 func LoadViper(v *viper.Viper, cfg *Config) error {
-	return getParametersAndDo(cfg.SearchPath, cfg.Recursive, func(params map[string]string) error {
+	svc, err := service.New()
+	if err != nil {
+		return err
+	}
+
+	return LoadViperWithService(svc, v, cfg)
+}
+
+// LoadViperWithService loads SSM parameters into a viper instance
+func LoadViperWithService(svc service.Service, v *viper.Viper, cfg *Config) error {
+	return getParametersAndDo(svc, cfg.SearchPath, cfg.Recursive, func(params map[string]string) error {
 		for key, value := range params {
-			key = utils.EscapeKey(key)
-			v.Set(key, value)
+			v.Set(utils.EscapeKey(key), value)
 		}
 
 		return nil
