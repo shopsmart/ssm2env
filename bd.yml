@@ -1,0 +1,7 @@
+application: ssm2env
+
+metadata:
+  team: techops
+  type: tool
+  language: go
+  dependencies: gomod
