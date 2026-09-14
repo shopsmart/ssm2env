@@ -33,7 +33,7 @@ jobs:
         run: go test -v ./...
 
       - name: 'Setup brew'
-        uses: Homebrew/actions/setup-homebrew@master
+        uses: Homebrew/actions/setup-homebrew@2026.09.13.1
 
       - name: 'Install BATS'
         run: brew install bats-core
@@ -56,7 +56,7 @@ jobs:
           cache-file: go.sum
 
       - name: 'Setup brew'
-        uses: Homebrew/actions/setup-homebrew@master
+        uses: Homebrew/actions/setup-homebrew@2026.09.13.1
 
       - name: 'Install dev dependencies'
         run: brew bundle install
