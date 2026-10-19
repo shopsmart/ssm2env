@@ -33,10 +33,9 @@ jobs:
         run: go test -v ./...
 
       - name: 'Setup brew'
-        uses: Homebrew/actions/setup-homebrew@2026.09.13.1
-
-      - name: 'Install BATS'
-        run: brew install bats-core
+        uses: shopsmart/bd-actions/setup-homebrew@feat/setup-homebrew
+        with:
+          packages: bats-core
 
       - name: 'Run integration tests'
         run: bats -r tests/*.bats
@@ -56,10 +55,9 @@ jobs:
           cache-file: go.sum
 
       - name: 'Setup brew'
-        uses: Homebrew/actions/setup-homebrew@2026.09.13.1
-
-      - name: 'Install dev dependencies'
-        run: brew bundle install
+        uses: shopsmart/bd-actions/setup-homebrew@feat/setup-homebrew
+        with:
+          brewfile: Brewfile
 
       - name: 'Run pre-commit check'
         uses: pre-commit/action@v3.0.0
