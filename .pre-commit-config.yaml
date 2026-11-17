@@ -24,10 +24,12 @@ repos:
 
   # Go hooks
   - repo: https://github.com/tekwizely/pre-commit-golang
-    rev: 302c7fd28cdbb62d5fd1e3965fe36e33a5f77803
+    rev: e654b74da062c54e9574572365ba5af8a861d04b
     hooks:
       - id: go-build-mod
       - id: go-mod-tidy
       - id: go-imports
+        args: [--hook:go-tool]
       - id: go-fmt
       - id: go-critic
+        args: [--hook:go-tool]
