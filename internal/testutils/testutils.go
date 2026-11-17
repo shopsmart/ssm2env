@@ -8,7 +8,7 @@ import (
 	"github.com/golang/mock/gomock"
 )
 
-//go:generate mockgen -source=../../pkg/service/service.go -destination=gen_service_mocks.go -package testutils SSMClient,Service
+//go:generate go tool mockgen -source=../../pkg/service/service.go -destination=gen_service_mocks.go -package testutils SSMClient,Service
 
 // MockController is a gomock controller
 var MockController *gomock.Controller
