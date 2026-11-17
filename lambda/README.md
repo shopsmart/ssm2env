@@ -6,6 +6,10 @@ For non `provided.al2`, ee can create an ssm2env lambda layer which will run the
 
 **You must set the `AWS_LAMBDA_EXEC_WRAPPER` environment variable in your lambda to `/opt/ssm2env-wrapper.sh`**
 
+Lambda allows only one exec wrapper.  To run another one after ssm2env's, such as OpenTelemetry's
+`/opt/otel-handler`, set `SSM2ENV_EXEC_WRAPPER` to its path: the wrapper loads the parameters, then
+runs that wrapper with the runtime's command.
+
 To make use of this layer, simply create a lambda layer for the desired architecture or both and upload the provided release zips as the source.  In the future, it would be nice to see this as a public layer for consumption, but for now, it will be dependent on the consumer of this layer to create the layer themselves.
 
 ```bash
