@@ -17,12 +17,6 @@ end
 # go dependencies
 # brew 'gcc'
 if ENV.fetch('CI', 'false') != 'true'
-  brew 'go@1.23'
+  brew 'go'
   brew 'goreleaser'
-end
-
-puts 'Installing go tools'
-%x( go version )
-File.readlines('go.tools').each do |line|
-  %x( go install #{line} )
 end
