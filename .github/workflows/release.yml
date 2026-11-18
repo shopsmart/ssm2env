@@ -20,28 +20,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 'Checkout'
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: 'Setup go'
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
-          cache-file: go.sum
+          cache-dependency-path: go.sum
 
       - name: 'Run GoReleaser'
-        uses: goreleaser/goreleaser-action@v2
+        uses: goreleaser/goreleaser-action@v6
         with:
           # either 'goreleaser' (default) or 'goreleaser-pro'
           distribution: goreleaser
-          version: latest
-          args: release --rm-dist
+          # .goreleaser.yml is in the v1 format (brews.tap, folder); v2 would need it migrated
+          version: '~> v1'
+          args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
           # Your GoReleaser Pro key, if you are using the 'goreleaser-pro' distribution
           # GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
 
       - name: 'Upload artifacts'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: ssm2env
           path: dist/*
@@ -52,7 +53,7 @@ jobs:
     needs: build
     steps:
       - name: 'Checkout'
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: 'Setup homebrew'
         uses: Homebrew/actions/setup-homebrew@2026.09.13.1
@@ -61,13 +62,13 @@ jobs:
         run: brew install bats-core
 
       - name: 'Download artifacts'
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: ssm2env
           path: dist/
 
       - name: 'Configure AWS credentials'
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -81,7 +82,7 @@ jobs:
           bats -r tests/*.bats
 
       - name: 'Upload the release assets'
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
