@@ -42,6 +42,8 @@ brews:
     tap:
       owner: shopsmart
       name: homebrew-ssm2env
+      # The workflow's own GITHUB_TOKEN can't push to another repository
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
     folder: Formula
     ids:
       - default

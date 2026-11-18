@@ -37,7 +37,9 @@ jobs:
           version: '~> v1'
           args: release --clean
         env:
-          GITHUB_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+          # The release is this repository's; the tap push needs a token for homebrew-ssm2env
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
           # Your GoReleaser Pro key, if you are using the 'goreleaser-pro' distribution
           # GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
 
